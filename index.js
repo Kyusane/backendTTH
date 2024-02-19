@@ -125,12 +125,12 @@ setInterval(() => {
 
 // MQTT PROTOCOL HANDLE START
 const mqtt = require("mqtt");
-const client = mqtt.connect("mqtt://36.66.152.254:1884",
+const client = mqtt.connect(`mqtt://${process.env.MQTT_HOST}`,
      {
           clean: true,
           connectTimeout: 5000,
-          username: 'brokerTTH',
-          password: 'brokerTTH',
+          username: `${process.env.MQTT_USERNAME}`,
+          password: `${process.env.MQTT_PASSWORD}`,
           reconnectPeriod: 1000,
      });
 //CONNECT ke BROKER
