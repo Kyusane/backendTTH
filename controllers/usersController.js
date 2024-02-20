@@ -55,6 +55,26 @@ const getEndpoints = (req, res) => {
 }
 
 const getRecords = (req, res) => {
+     const { deviceName, startDate, endDate } = req.params
+     const getRecords = `SELECT * FROM records WHERE device_name = '${deviceName}' AND created_at BETWEEN ${startDate} AND ${endDate}`
+     db.query(getRecords, (err, fields) => {
+          if (err) throw err
+          var data = fields.map(d => {
+               return {
+                    ts: parseInt(d.created_at),
+                    val: {
+                         frequency: d.frequency,
+                         humidity: d.humidity,
+                         temperature: d.temperature,
+                         voltage: d.voltage
+                    }
+               }
+          })
+          res.status(200).json(data)
+     })
+}
+
+const getRecordsAll = (req, res) => {
      const { deviceName } = req.params
      const getRecords = `SELECT * FROM records WHERE device_name = '${deviceName}'`
      db.query(getRecords, (err, fields) => {
@@ -72,7 +92,6 @@ const getRecords = (req, res) => {
           })
           res.status(200).json(data)
      })
-
 }
 
 const getChartBar = (req, res) => {
@@ -135,5 +154,6 @@ module.exports = {
      createEndpoint,
      getEndpoints,
      getRecords,
+     getRecordsAll,
      getChartBar
 }
