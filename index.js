@@ -65,8 +65,7 @@ var checkIndex = initialIndeks();
 var time //mendefinisikan waktu untuk process matching dengan checking time
 
 function initialIndeks() {
-     const now = new Date();
-     const hour = now.getHours();
+     const hour = timeMatching[0];
      if (hour < 9 || hour >= 15) {
           return 0;
      } else if (hour >= 9 && hour < 12) {
@@ -118,7 +117,7 @@ setInterval(() => {
           })
 
           //AMBIL RECORD DATA ANTARA PUKUL 9:00 , 12:00, 15:00 hingga +7 menit (Hanya 1 record per device)
-          selectRecordData = `SELECT DISTINCT device_name from records WHERE created_at > ${Date.now() - 300000}`
+          selectRecordData = `SELECT DISTINCT device_name from records WHERE created_at > ${Date.now() - 480000}`
           db.query(selectRecordData, (err, fields) => {
                if (err) throw err
                // PENCOCOKAN DATA
