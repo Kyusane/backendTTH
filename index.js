@@ -178,7 +178,8 @@ client.on("message", (topic, message) => {
                try {
                     db.query(getInfo, (err, fields) => {
                          if (err) throw err
-                         sendNotificationBot(fields[0].bot_token, fields[0].chat_identifier, mssg[1])
+                         fields.length == 0 ? null :
+                              sendNotificationBot(fields[0].bot_token, fields[0].chat_identifier, mssg[1])
                     })
                } catch (err) {
                     console.log(err)
