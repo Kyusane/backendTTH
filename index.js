@@ -11,6 +11,7 @@ const path = require('path')
 const oauthRoutes = require('./routes/oauthRoutes')
 const devicesRoutes = require('./routes/devicesRoutes')
 const usersRoutes = require('./routes/usersRoutes')
+const adminRoutes = require('./routes/adminRoutes')
 
 // mendefiniskan fungsi ekspress pada variabel App
 const app = express()
@@ -33,10 +34,14 @@ app.use((req, res, next) => {
 app.use('/v1/oauth', oauthRoutes) // untuk menangani request autentifikasi seperti sign in dan sign up
 app.use('/v1/users', usersRoutes) // untuk menangani request yang berkaitan dengan user 
 app.use('/v1/devices', devicesRoutes) // untuk menangani requeset yang berkaitan dengan device
+app.use('/v1/admin', adminRoutes) // untuk menangani requeset yang berkaitan dengan device
 
 // menangani request pada path '/'
 app.get('/', (req, res) => {
      res.sendFile(path.join(__dirname, '/index.html')); // mengirim response berupa file statik HTML
+})
+app.get('/admin', (req, res) => {
+     res.sendFile(path.join(__dirname, '/admin/index.html')); // mengirim response berupa file statik HTML
 })
 
 // menangani setiap request yang tidak didefinisikan

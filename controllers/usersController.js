@@ -149,6 +149,11 @@ const getChartBar = (req, res) => {
 
 }
 
+
+const getDeviceAll = (req,res) => {
+
+}
+
 module.exports = {
      getResources,
      createEndpoint,
