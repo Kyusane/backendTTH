@@ -53,7 +53,7 @@ const userLogin = async (req, res) => {
                }
                //apabila cocok maka mengembalikan data email, token, device_id, device_name , LOGIN BERHASIL
                const token = createToken(fields[0].user_id)
-               res.status(200).json({ email, token, device_id: fields[0].id, device_name: fields[0].device_name })
+               res.status(200).json({ email, token, username: fields[0].username, device_name: fields[0].device_name })
           })
      }
      catch (error) {
