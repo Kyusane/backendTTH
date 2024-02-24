@@ -122,7 +122,7 @@ setInterval(() => {
           })
 
           //AMBIL RECORD DATA ANTARA PUKUL 9:00 , 12:00, 15:00 hingga +7 menit (Hanya 1 record per device)
-          selectRecordData = `SELECT DISTINCT device_name from records WHERE created_at > ${Date.now() - 480000}`
+          selectRecordData = `SELECT DISTINCT device_name from records WHERE created_at > ${Date.now() - 420000}`
           db.query(selectRecordData, (err, fields) => {
                if (err) throw err
                // PENCOCOKAN DATA
