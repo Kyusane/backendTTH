@@ -108,20 +108,21 @@ setInterval(() => {
      if (time[0] == checkTime[checkIndex] && time[1] > 15) {
           var deviceData = [] //variabel penyimpan data device
           var endpoints = [] //variabel penyimpan data endpoint
-          selectAllDevice = `SELECT devices.device_name, endpoints.bot_token, endpoints.chat_identifier 
-          FROM devices INNER JOIN endpoints WHERE devices.device_name = endpoints.device_name`
+          selectAllDevice = `SELECT devices.device_name, endpoints.bot_token, endpoints.chat_identifier , users.username
+          FROM devices INNER JOIN endpoints ON devices.device_name = endpoints.device_name INNER JOIN users ON devices.user_id = users.id `
           db.query(selectAllDevice, (err, fields) => {
                if (err) throw err
                fields.map(d => {
                     deviceData.push(d.device_name)
                     endpoints.push({
                          bot_token: d.bot_token,
-                         chat_identifier: d.chat_identifier
+                         chat_identifier: d.chat_identifier,
+                         username: d.username
                     })
                })
           })
 
-          //AMBIL RECORD DATA ANTARA PUKUL 9:00 , 12:00, 15:00 hingga +7 menit (Hanya 1 record per device)
+          //AMBIL RECORD DATA ANTARA PUKUL 9:00 , 12:00, 15:00 hingga +15 menit (Hanya 1 record per device)
           selectRecordData = `SELECT DISTINCT device_name from records WHERE created_at > ${Date.now() - 900000}`
           db.query(selectRecordData, (err, fields) => {
                if (err) throw err
@@ -130,7 +131,7 @@ setInterval(() => {
                // apabila data device tidak ada pada record maka akan mengirimkan notifikasi telegram
                deviceData.map(d => {
                     fields.includes(d) ? null :
-                         sendNotificationBot(endpoints[deviceData.indexOf(d)].bot_token, endpoints[deviceData.indexOf(d)].chat_identifier, `ENMOS device did not record data at ${checkTime[checkIndex]} o'clock`)
+                         sendNotificationBot(endpoints[deviceData.indexOf(d)].bot_token, endpoints[deviceData.indexOf(d)].chat_identifier, `Device ${endpoints[deviceData.indexOf(d)].username} did not record data at ${checkTime[checkIndex]} o'clock`)
                })
           })
           checkIndex == 2 ? checkIndex = 0 : checkIndex++
