@@ -58,8 +58,8 @@ app.listen(process.env.PORT, () => {
 
 //variabel untuk process records data dalam interval tertentu
 var startRecord = false;
-const timerStartDurationSeconds = 5 * 60; //process record berjalan setiap 5 menit 5 * 60 detik
-const timerEndDurationSeconds = 1 * 60; //process record berlangsung selama 1 menit 1 * 60 detik
+const timerStartDurationSeconds = 10 * 60; //process record berjalan setiap 5 menit 5 * 60 detik
+const timerEndDurationSeconds = 0.5 * 60; //process record berlangsung selama 1 menit 1 * 60 detik
 let timerStart = new Date().getTime(); // mendefinisikan waktu sekarang
 let timerEnd = timerEndDurationSeconds // mendefinisikan timer berhenti
 
@@ -105,7 +105,7 @@ setInterval(() => {
      //FUNGSI MEMULAI NOTIFIKASI / PERINGATAN VIA TELEGRAM START
      //Program akan berjalan menurut waktu yang ditentukan +7 menit [8:07 ,12:07:15:07]
      //ambil list DEVICE dan END POINT (hanya device yang memiliki endpoint)
-     if (time[0] == checkTime[checkIndex] && time[1] > 7) {
+     if (time[0] == checkTime[checkIndex] && time[1] > 15) {
           var deviceData = [] //variabel penyimpan data device
           var endpoints = [] //variabel penyimpan data endpoint
           selectAllDevice = `SELECT devices.device_name, endpoints.bot_token, endpoints.chat_identifier 
@@ -122,7 +122,7 @@ setInterval(() => {
           })
 
           //AMBIL RECORD DATA ANTARA PUKUL 9:00 , 12:00, 15:00 hingga +7 menit (Hanya 1 record per device)
-          selectRecordData = `SELECT DISTINCT device_name from records WHERE created_at > ${Date.now() - 420000}`
+          selectRecordData = `SELECT DISTINCT device_name from records WHERE created_at > ${Date.now() - 900000}`
           db.query(selectRecordData, (err, fields) => {
                if (err) throw err
                // PENCOCOKAN DATA
@@ -131,9 +131,9 @@ setInterval(() => {
                deviceData.map(d => {
                     fields.includes(d) ? null :
                          sendNotificationBot(endpoints[deviceData.indexOf(d)].bot_token, endpoints[deviceData.indexOf(d)].chat_identifier, `ENMOS device did not record data at ${checkTime[checkIndex]} o'clock`)
-                    checkIndex == 2 ? checkIndex = 0 : checkIndex++
                })
           })
+          checkIndex == 2 ? checkIndex = 0 : checkIndex++
      }
      //FUNGSI MEMULAI NOTIFIKASI / PERINGATAN VIA TELEGRAM START
 }, 10000);
