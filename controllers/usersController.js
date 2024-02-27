@@ -2,6 +2,7 @@
 
 const db = require("../connection")
 const jwt = require('jsonwebtoken')
+const bcrypt = require('bcrypt')
 
 
 const getResources = async (req, res) => {
@@ -150,8 +151,48 @@ const getChartBar = (req, res) => {
 }
 
 
-const getDeviceAll = (req,res) => {
+const changePassword = async (req, res) => {
+     const { newPassword, email, uniqueCode } = req.body
+     const salt = await bcrypt.genSalt(10)
+     const hash = await bcrypt.hash(newPassword, salt)
+     const changeSql = `UPDATE users SET password = '${hash}' WHERE email = '${email}'`
+     const check = `SELECT * FROM uniqcode WHERE email = '${email}'`
+     const delSql = `DELETE FROM uniqcode WHERE email = '${email}' AND uniqcode = '${uniqueCode}'`
+     try {
+          db.query(check, (err, fields) => {
+               if (err) throw err
+               if (fields.length != 0) {
+                    if (fields[0].uniqcode == uniqueCode) {
+                         db.query(changeSql, (err) => {
+                              if (err) throw err
+                              db.query(delSql, (err) => {
+                                   if (err) throw err
+                                   res.status(200).json({ mssg: "PASSWORD CHANGED" })
+                              })
+                         })
+                    } else {
+                         res.status(400).json({ mssg: "request is not permitted" })
+                    }
+               } else {
+                    res.status(400).json({ mssg: "request is not permitted" })
+               }
+          })
+     } catch (error) {
+          res.status(400).json({ mssg: "ACTION FAILED" })
+     }
+}
 
+const updateThreshold = (req, res) => {
+     const { email, hum_bot, hum_top, temp_bot, temp_top } = req.body
+     const sql = `UPDATE users SET hum_bot =${hum_bot} , hum_top =${hum_top} , temp_bot =${temp_bot} , temp_top=${temp_top} WHERE email ='${email}'`
+     try {
+          db.query(sql, (err, fields) => {
+               if (err) throw err
+               res.status(200).json({ mssg: "UPDATE BERHASIL" })
+          })
+     } catch (error) {
+          res.status(400).json({ mssg: "ACTION FAILED" })
+     }
 }
 
 module.exports = {
@@ -160,5 +201,7 @@ module.exports = {
      getEndpoints,
      getRecords,
      getRecordsAll,
-     getChartBar
+     getChartBar,
+     changePassword,
+     updateThreshold
 }

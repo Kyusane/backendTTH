@@ -4,7 +4,7 @@ const express = require('express')
 const router = express.Router()
 const requireAuth = require('../middleware/requireAuth')
 
-const { getResources, createEndpoint, getRecords, getEndpoints, getChartBar, getRecordsAll } = require('../controllers/usersController')
+const { getResources, createEndpoint, getRecords, getEndpoints, getChartBar, getRecordsAll, changePassword, updateThreshold } = require('../controllers/usersController')
 
 //SETIAP REQUEST MEMERLUKAN AUTENTIFIKASI
 router.use(requireAuth) //Middleware authentifikasi
@@ -17,5 +17,7 @@ router.get('/records/:deviceName/:startDate/:endDate', getRecords) //memperoleh 
 router.get('/records/:deviceName', getRecordsAll) //memperoleh records device
 router.get('/records/bar/:deviceName', getChartBar) // memperoleh data char Bar
 router.post('/endpoint/create', createEndpoint) //membuat endpoint telegram
+router.patch('/password/change', changePassword) //mengubah password
+router.patch('/threshold/update', updateThreshold) //mengupdate thresshold
 
 module.exports = router

@@ -8,8 +8,8 @@ const bcrypt = require('bcrypt')
 const validator = require('validator')
 
 //Generate token dengan parameter user_id
-const createToken = (_id) => {
-     return jwt.sign({ _id }, process.env.SECRET, { expiresIn: '3d' })
+const createToken = (credential_id) => {
+     return jwt.sign({ credential_id }, process.env.SECRET, { expiresIn: '3d' })
 }
 
 //Generate User Id dengan parameter UNIX_TIMESTAMP
@@ -53,7 +53,11 @@ const userLogin = async (req, res) => {
                }
                //apabila cocok maka mengembalikan data email, token, device_id, device_name , LOGIN BERHASIL
                const token = createToken(fields[0].user_id)
-               res.status(200).json({ email, token, username: fields[0].username, device_name: fields[0].device_name })
+               const threshold = {
+                    hum: [fields[0].hum_bot, fields[0].hum_top],
+                    temp: [fields[0].temp_bot, fields[0].temp_top],
+               }
+               res.status(200).json({ email, token, threshold, username: fields[0].username, device_name: fields[0].device_name })
           })
      }
      catch (error) {
@@ -84,8 +88,8 @@ const userSignUp = async (req, res) => {
           const salt = await bcrypt.genSalt(10)
           const hash = await bcrypt.hash(password, salt)
           const device_name = createDeviceName(30);
-          const sqlSignUp = `INSERT INTO users (id,username, email, password, created_at) 
-               VALUES ('${userId}','${username}','${email}','${hash}','${_timestamp}')`
+          const sqlSignUp = `INSERT INTO users (id,username, email, password, created_at, hum_bot, hum_top, temp_bot, temp_top) 
+               VALUES ('${userId}','${username}','${email}','${hash}','${_timestamp}',40,70,21,25)`
 
           //Memasukan data ke database
           db.query(sqlSignUp, (err) => {
@@ -104,7 +108,6 @@ const userSignUp = async (req, res) => {
      }
 }
 
-
 //LOGIN FUNCTION
 const adminLogin = async (req, res) => {
      //memperoleh data email dan password
@@ -113,27 +116,18 @@ const adminLogin = async (req, res) => {
           if (!email || !password) {//memastikan data lengkap
                res.status(400).json({ error: "All field must be Filled" })
           }
-          //mencocokan data dengan database
-          // const sql = `SELECT * FROM users INNER JOIN devices ON users.id = devices.user_id where users.email='${email}'`
-          // db.query(sql, async (err, fields) => {
-          //      //apabila tidak cocok atau error maka login gagal
-          //      if (err) throw err
-          //      if (fields.length == 0) {
-          //           return res.status(400).json({ error: "Incorrect email" })
-          //      }
-          //      const matching = await bcrypt.compare(password, fields[0].password)
-          //      if (!matching) {
-          //           return res.status(400).json({ error: "Incorrect password" })
-          //      }
-          //      //apabila cocok maka mengembalikan data email, token, device_id, device_name , LOGIN BERHASIL
-          //      const token = createToken(fields[0].user_id)
-          //      res.status(200).json({ email, token, device_id: fields[0].id, device_name: fields[0].device_name })
-          // })
-          if (email == process.env.ADMIN_EMAIL && password == process.env.ADMIN_PASSWORD) {
-               res.status(200).json({ email, token: createToken(email) })
-          } else {
-               res.status(400).json({ error: "Login Failed" })
-          }
+          const sql = `SELECT * FROM admin  where admin.email='${email}'`
+          db.query(sql, async (err, fields) => {
+               if (err) throw err
+               if (fields.length == 0) {
+                    return res.status(400).json({ error: "Login Failed" })
+               }
+               if (fields[0].password != password) {
+                    return res.status(400).json({ error: "Login Failed" })
+               }
+               const token = createToken(fields[0].credential_id)
+               res.status(200).json({ email, token })
+          })
      }
      catch (error) {
           res.status(400).json({ error: error.message })//ERROR HANDLER

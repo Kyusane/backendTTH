@@ -131,7 +131,7 @@ setInterval(() => {
                // apabila data device tidak ada pada record maka akan mengirimkan notifikasi telegram
                deviceData.map(d => {
                     fields.includes(d) ? null :
-                         sendNotificationBot(endpoints[deviceData.indexOf(d)].bot_token, endpoints[deviceData.indexOf(d)].chat_identifier, `Device ${endpoints[deviceData.indexOf(d)].username} did not record data at ${checkTime[checkIndex]} o'clock`)
+                         sendNotificationBot(endpoints[deviceData.indexOf(d)].bot_token, endpoints[deviceData.indexOf(d)].chat_identifier, `Device ${endpoints[deviceData.indexOf(d)].username} did not record data `)
                })
           })
           checkIndex == 2 ? checkIndex = 0 : checkIndex++
